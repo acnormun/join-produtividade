@@ -121,18 +121,21 @@ class ProcessadorTabelas:
         except Exception as e:
             raise Exception(f"Erro ao carregar tabela de referência: {e}")
     
-    def carregar_caixa(self, caminho1: str, caminho2: str) -> bool:
-        """Carrega e concatena as 2 planilhas CAIXA. Retorna True se sucesso."""
+    def carregar_caixa(self, caminho1: str, caminho2: Optional[str] = None) -> bool:
+        """Carrega planilhas CAIXA. A segunda planilha e opcional."""
         try:
             caixa1 = self._ler_csv(caminho1)
-            caixa2 = self._ler_csv(caminho2)
             
             # Validar se coluna C existe (considerando índice 2)
             self._validar_indice_coluna(caixa1, self.caixa_coluna_indice, "Planilha CAIXA 1")
-            self._validar_indice_coluna(caixa2, self.caixa_coluna_indice, "Planilha CAIXA 2")
+            caixas = [caixa1]
+            if caminho2:
+                caixa2 = self._ler_csv(caminho2)
+                self._validar_indice_coluna(caixa2, self.caixa_coluna_indice, "Planilha CAIXA 2")
+                caixas.append(caixa2)
             
-            # Concatenar as 2 CAIXA
-            self.caixa_df = pd.concat([caixa1, caixa2], ignore_index=True)
+            # Concatenar as planilhas CAIXA disponiveis
+            self.caixa_df = pd.concat(caixas, ignore_index=True)
             return True
         except Exception as e:
             raise Exception(f"Erro ao carregar planilhas CAIXA: {e}")
@@ -194,7 +197,7 @@ class ProcessadorTabelas:
         except Exception as e:
             raise Exception(f"Erro ao exportar para Excel: {e}")
     
-    def processar_completo(self, ref_path: str, caixa1_path: str, caixa2_path: str, 
+    def processar_completo(self, ref_path: str, caixa1_path: str, caixa2_path: Optional[str],
                           voto_path: str, output_path: str) -> bool:
         """Executa pipeline completo de processamento."""
         self.carregar_referencia(ref_path)

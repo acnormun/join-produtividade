@@ -30,10 +30,10 @@ python main.py
 ### 3. Usar a interface
 
 1. **Selecionar arquivos CSV:**
-   - Clique em "Selecionar" para cada uma das 4 tabelas
+   - Clique em "Selecionar" para as tabelas obrigatorias
    - Tabela de Referência
    - Planilha CAIXA 1
-   - Planilha CAIXA 2
+   - Planilha CAIXA 2 (opcional)
    - Tabela VOTO
 
 2. **Processar:**
@@ -55,7 +55,9 @@ numeroProcesso, nomeProcesso, partes, status
 ...
 ```
 
-### Planilhas CAIXA (1 e 2)
+### Planilhas CAIXA
+A Planilha CAIXA 1 e obrigatoria. A Planilha CAIXA 2 e opcional; quando informada, ela e concatenada com a CAIXA 1.
+
 Devem ter pelo menos 3 colunas. A busca é feita na **coluna C (índice 2)**.
 
 ```

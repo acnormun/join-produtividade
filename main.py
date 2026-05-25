@@ -63,8 +63,8 @@ class AppEnriquecedorTabelas:
         # CAIXA 1
         self._criar_linha_arquivo(frame, "Planilha CAIXA 1:", self.caixa1_path, 1)
         
-        # CAIXA 2
-        self._criar_linha_arquivo(frame, "Planilha CAIXA 2:", self.caixa2_path, 2)
+        # CAIXA 2 (opcional)
+        self._criar_linha_arquivo(frame, "Planilha CAIXA 2 (opcional):", self.caixa2_path, 2)
         
         # VOTO
         self._criar_linha_arquivo(frame, "Tabela VOTO:", self.voto_path, 3)
@@ -159,9 +159,6 @@ class AppEnriquecedorTabelas:
         if not self.caixa1_path.get():
             messagebox.showerror("Erro", "Selecione a Planilha CAIXA 1")
             return False
-        if not self.caixa2_path.get():
-            messagebox.showerror("Erro", "Selecione a Planilha CAIXA 2")
-            return False
         if not self.voto_path.get():
             messagebox.showerror("Erro", "Selecione a Tabela VOTO")
             return False
@@ -188,7 +185,10 @@ class AppEnriquecedorTabelas:
             
             self._escrever_log("Carregando planilhas CAIXA...")
             self.processador.carregar_caixa(self.caixa1_path.get(), self.caixa2_path.get())
-            self._escrever_log("✓ Planilhas CAIXA carregadas e concatenadas\n")
+            if self.caixa2_path.get():
+                self._escrever_log("✓ Planilhas CAIXA carregadas e concatenadas\n")
+            else:
+                self._escrever_log("✓ Planilha CAIXA 1 carregada; CAIXA 2 não informada\n")
             
             self._escrever_log("Carregando tabela VOTO...")
             self.processador.carregar_voto(self.voto_path.get())
