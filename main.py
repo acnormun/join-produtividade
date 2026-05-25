@@ -199,8 +199,10 @@ class AppEnriquecedorTabelas:
             self._escrever_log("✓ Colunas 'Ta na caixa?' e 'Tem voto?' adicionadas\n")
             
             resultado = self.processador.get_resultado()
+            votos_sem_referencia = self.processador.get_votos_sem_referencia()
             self._escrever_log(f"\n✓ Processamento concluído com sucesso!")
             self._escrever_log(f"Total de linhas: {len(resultado)}")
+            self._escrever_log(f"Votos sem tabela de referencia: {len(votos_sem_referencia)}")
             self._escrever_log(f"Colunas criadas: Ta na caixa?, Tem voto?")
             
             # Habilitar botão de salvar

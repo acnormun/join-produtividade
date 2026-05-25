@@ -28,6 +28,7 @@ class ProcessadorTabelas:
         self.caixa_df = None
         self.voto_df = None
         self.resultado_df = None
+        self.votos_sem_referencia_df = None
         self.coluna_referencia = None
 
     def _normalizar_nome_coluna(self, coluna: str) -> str:
@@ -162,12 +163,14 @@ class ProcessadorTabelas:
             referencia_coluna_busca = self._normalizar_valores_busca(
                 resultado.iloc[:, self.referencia_coluna_indice]
             )
+            referencia_valores_busca = set(referencia_coluna_busca)
             caixa_valores_busca = set(
                 self._normalizar_valores_busca(self.caixa_df.iloc[:, self.caixa_coluna_indice])
             )
-            voto_valores_busca = set(
-                self._normalizar_valores_busca(self.voto_df.iloc[:, self.voto_coluna_indice])
+            voto_coluna_normalizada = self._normalizar_valores_busca(
+                self.voto_df.iloc[:, self.voto_coluna_indice]
             )
+            voto_valores_busca = set(voto_coluna_normalizada)
             caixa_coluna_busca = pd.Series(list(caixa_valores_busca))
             voto_coluna_busca = pd.Series(list(voto_valores_busca))
             
@@ -182,6 +185,11 @@ class ProcessadorTabelas:
             )
             
             self.resultado_df = resultado
+            votos_sem_referencia_mask = (
+                voto_coluna_normalizada.ne("")
+                & ~voto_coluna_normalizada.isin(referencia_valores_busca)
+            )
+            self.votos_sem_referencia_df = self.voto_df.loc[votos_sem_referencia_mask].copy()
             return True
         except Exception as e:
             raise Exception(f"Erro ao adicionar colunas de busca: {e}")
@@ -192,7 +200,14 @@ class ProcessadorTabelas:
             raise ValueError("Nenhum resultado disponível para exportar")
         
         try:
-            self.resultado_df.to_excel(caminho_saida, index=False, sheet_name="Resultado")
+            with pd.ExcelWriter(caminho_saida, engine="openpyxl") as writer:
+                self.resultado_df.to_excel(writer, index=False, sheet_name="Resultado")
+                if self.votos_sem_referencia_df is not None:
+                    self.votos_sem_referencia_df.to_excel(
+                        writer,
+                        index=False,
+                        sheet_name="Votos sem referencia",
+                    )
             return True
         except Exception as e:
             raise Exception(f"Erro ao exportar para Excel: {e}")
@@ -210,3 +225,7 @@ class ProcessadorTabelas:
     def get_resultado(self) -> Optional[pd.DataFrame]:
         """Retorna dataframe com resultado."""
         return self.resultado_df
+
+    def get_votos_sem_referencia(self) -> Optional[pd.DataFrame]:
+        """Retorna votos cujo processo nao existe na tabela de referencia."""
+        return self.votos_sem_referencia_df
